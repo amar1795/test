@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -5,27 +6,77 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
-import React from "react";
-
-const CustomCard = () => {
+export function TabsDemo() {
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Card Title</CardTitle>
-          <CardDescription>Card Description</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Card Content</p>
-        </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
-        </CardFooter>
-      </Card>
-    </div>
-  );
-};
-
-export default CustomCard;
+    <Tabs defaultValue="account" className="w-[400px]">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">LOGIN</TabsTrigger>
+        <TabsTrigger value="password">SIGNUP</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
+        <Card>
+          <CardHeader>
+            <CardTitle>Please Login To Continue</CardTitle>
+            {/* <CardDescription>
+              Make changes to your account here. Click save when you're done.
+            </CardDescription> */}
+          </CardHeader>
+          <CardContent className="space-y-2">
+          
+            <div className="space-y-1">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" defaultValue="@peduarte" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="name">Password</Label>
+              <Input type="password"  />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button>Login</Button>
+          </CardFooter>
+        </Card>
+      </TabsContent>
+      <TabsContent value="password">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Account</CardTitle>
+           
+          </CardHeader>
+          <CardContent className="space-y-2">
+          <div className="space-y-1">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username"  />
+            </div> 
+            <div className="space-y-1">
+              <Label htmlFor="username">Country</Label>
+              <Input id="username"  />
+            </div> 
+            <div className="space-y-1">
+              <Label htmlFor="username">Password</Label>
+              <Input id="username" type="password"  />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="username">Confirm Password</Label>
+              <Input id="username" type="password"  />
+            </div>
+            
+          </CardContent>
+          <CardFooter>
+            <Button>Create Account</Button>
+          </CardFooter>
+        </Card>
+      </TabsContent>
+    </Tabs>
+  )
+}
