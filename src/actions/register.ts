@@ -25,7 +25,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   await prismadb.user.create({
     data: {
       name:fullname,
-    country:country,
+      country:country,
       password: hashedPassword,
     },
   });

@@ -36,7 +36,20 @@ export function TabsDemo() {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
+  const [isSignup, setIsSignup] = useState(false);
 
+
+
+
+   // Function to toggle between signup and login
+ const toggleView = () => {
+  setIsSignup((prev) => {
+    const newState = !prev;
+    // Save the new state to local storage
+    localStorage.setItem('isSignup', JSON.stringify(newState));
+    return newState;
+  });
+};
 
 
 
@@ -91,19 +104,22 @@ export function TabsDemo() {
       alert(error);
     }
     if (success) {
-      // setIsSignup(false);
+      setIsSignup(false);
       // alert(success);
       reset();
     }
-  }, [error, success]);
+  }, [error, success,setIsSignup]);
+
+
+
 
   return (
-    <Tabs defaultValue="account" className="w-[400px]">
+    <Tabs defaultValue="login" className="w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="account">LOGIN</TabsTrigger>
-        <TabsTrigger value="password">SIGNUP</TabsTrigger>
+        <TabsTrigger value="login">LOGIN</TabsTrigger>
+        <TabsTrigger value="signup">SIGNUP</TabsTrigger>
       </TabsList>
-      <TabsContent value="account">
+      <TabsContent value="login">
         <Card>
           <CardHeader>
             <CardTitle>Please Login To Continue</CardTitle>
@@ -111,10 +127,12 @@ export function TabsDemo() {
               Make changes to your account here. Click save when you're done.
             </CardDescription> */}
           </CardHeader>
+          <form className="mt-8" onSubmit={handleSubmit(onSubmit)}>
+
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
+              <Input id="username"  />
             </div>
             <div className="space-y-1">
               <Label htmlFor="name">Password</Label>
@@ -124,9 +142,11 @@ export function TabsDemo() {
           <CardFooter>
             <Button>Login</Button>
           </CardFooter>
+          </form>
         </Card>
       </TabsContent>
-      <TabsContent value="password">
+
+      <TabsContent value="signup">
         <Card>
           <CardHeader>
             <CardTitle>Create Account</CardTitle>
