@@ -13,10 +13,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { RegisterSchema } from "@/schemas";
+import { LoginSchema, RegisterSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { redirect } from 'next/navigation'
 
 import {
   Select,
@@ -28,6 +29,7 @@ import {
 import { register } from "@/actions/register";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { login } from "@/actions/login";
 
 export function TabsDemo() {
   const [countries, setCountries] = useState([]);
@@ -80,6 +82,48 @@ export function TabsDemo() {
   };
 
   const {
+    register: loginfield,
+    handleSubmit: loginhandleSubmit,
+    formState: { errors: loginerrors },
+    reset:loginreset,
+  } = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+
+  
+  const onSubmitLogin = (values: z.infer<typeof LoginSchema>) => {
+    setError("");
+    setSuccess("");
+
+    startTransition(() => {
+      login(values)
+        .then((data) => {
+          if (data?.error) {
+            // reset();
+            alert(data.error);
+            setError(data.error);
+          }
+
+          if (data?.success) {
+            loginreset();
+            alert("redirection successfull");
+            setSuccess(data.success);
+            redirect(`/home`) // Navigate to the new post page
+          }
+
+        })
+        .catch(() => setError("Something went wrong"));
+    });
+  };
+
+
+
+  const {
     setValue,
     register: registerField,
     handleSubmit,
@@ -127,17 +171,27 @@ export function TabsDemo() {
               Make changes to your account here. Click save when you're done.
             </CardDescription> */}
           </CardHeader>
-          <form className="mt-8" onSubmit={handleSubmit(onSubmit)}>
+          <form className="mt-8" onSubmit={loginhandleSubmit(onSubmitLogin)}>
 
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="username">Username</Label>
-              <Input id="username"  />
+              <Input id="username"  {...loginfield("username")} />
             </div>
+            {loginerrors.username && (
+                  <span className="  text-red-800  text-[0.7rem]">
+                    {loginerrors.username.message}
+                  </span>
+                )}
             <div className="space-y-1">
               <Label htmlFor="name">Password</Label>
-              <Input type="password" />
+              <Input type="password" {...loginfield("password")}  />
             </div>
+            {loginerrors.password && (
+                  <span className="  text-red-800  text-[0.7rem]">
+                    {loginerrors.password.message}
+                  </span>
+                )}
           </CardContent>
           <CardFooter>
             <Button>Login</Button>

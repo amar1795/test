@@ -6,6 +6,7 @@ import Credentials from "next-auth/providers/credentials";
 import * as z from "zod";
 import { prismadb } from "@/lib/db";
 import { LoginSchema } from "@/schemas";
+import { getUserByUsername } from "./actions/login";
 
 
 export const getUserByEmail = async (email: string) => {
@@ -27,7 +28,7 @@ export default {
         if (validatedFields.success) {
           const { username, password } = validatedFields.data;
           
-          const user = await getUserByEmail(username);
+          const user = await getUserByUsername(username);
           if (!user || !user.password) return null;
 
           const passwordsMatch = await bcrypt.compare(
