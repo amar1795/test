@@ -119,7 +119,11 @@ console.log("this is the selected user role ",selectedUserRole);
 
                 <div className="w-[10rem] pt-1.5 ">
                 <Select 
-                 onValueChange={(value) => setCountry(value)}
+                 onValueChange={(value) => {
+                  const selectedUser = alluserData.find((user) => user.name === value);
+                  handleSetData(selectedUser); // Call your function with the selected user data
+                  setCountry(value); // Update the state for country
+                }}
                 //  value={watch("country")} // Add this to sync with form state
 >
                   <SelectTrigger id="framework">
@@ -129,16 +133,16 @@ console.log("this is the selected user role ",selectedUserRole);
                   <SelectContent position="popper"  >
                     {alluserData.length > 0 && (
                       <>
-                        {alluserData.map((userName, index) => (
-                          <SelectItem
-                            value={userName?.name}
-                            key={index}
-                            onClick={()=>handleSetData(userName)}
- 
-                          >
-                            {userName?.name}
-                          </SelectItem>
-                        ))}
+                          {alluserData.map((userName, index) => (
+                            <SelectItem
+                              value={userName?.name}
+                              key={index}
+                              // onClick={()=>handleSetData(userName)}
+  
+                            >
+                              {userName?.name}
+                            </SelectItem>
+                          ))}
                       </>
                     )}
                   </SelectContent>
