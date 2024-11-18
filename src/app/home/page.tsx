@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { useCurrentUser } from '@/hooks/use-current-user';
 import { getUserCountry } from '@/actions/getUserCountry';
+import { DialogDemo } from '@/components/Modal';
+import { CardWithForm } from '@/components/Card';
 
 
 const Page = () => {
@@ -25,14 +27,14 @@ const Page = () => {
 const { data: session, status } = useSession();
   const user=useCurrentUser();
 
-
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [usercountry, setUserCountry] = useState<string | null>(null);
   const [countries, setCountries] = useState([]);
-  const [country, setCountry] = useState<string | null>(null);
+  const [country, setCountry] = useState<string | null>(user?.country);
   const [error, setError] = useState<string | null>(null);
   console.log("this is user from user hook",user);
-  // console.log("this is country selected by user",country);
+  console.log("this is country selected by user",country);
 
 
 
@@ -60,15 +62,6 @@ const { data: session, status } = useSession();
   }, []);
 
 
-  // useEffect(() => {
-  //   // Fetch countries from RestCountries API
-  //   fetch("api/user")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //      console.log("this is the data from the user api",data?.message);
-  //     })
-  //     .catch((error) => console.error("Error fetching countries:", error));
-  // }, []);
 
   const updateUserCountry = async () => {
     setIsLoading(true)
@@ -102,6 +95,15 @@ const { data: session, status } = useSession();
 
   useEffect(() => {
     updateUserCountry()
+    const getData = async () => {
+      const response = await fetch('/api/data')
+      
+       const data = await response.json()
+       setData(data)
+       alert("Data fetched successfully!");
+        console.log("this is the data from the user api",data);
+  }
+    getData();
   }, [country])
 
   
@@ -110,6 +112,19 @@ const { data: session, status } = useSession();
    await signOut({ redirect: true, callbackUrl: "/" });
    
   };
+
+//   useEffect(() => {
+
+//     const getData = async () => {
+//       const response = await fetch('/api/data')
+      
+//        const data = await response.json()
+//        setData(data)
+//       //  alert("Data fetched successfully!");
+//         console.log("this is the data from the user api",data);
+//   }
+//     getData();
+// }, [country]);
 
 
 
@@ -162,6 +177,25 @@ const { data: session, status } = useSession();
           </div>
         </div>
            </div>
+            </div>
+
+            <div>
+             <div className=' mt-7 ml-8'>
+            <DialogDemo selectedCountry={country} />
+             </div>
+              
+             <div className=' mt-6 ml-7'>
+
+              { (data.length === 0) ?(<h1 className=' mb-8 text-[2rem]'>No Tasks</h1>):<h1 className=' mb-8 text-[2rem]'>Your Tasks</h1>}
+          
+          <div className=' flex gap-7'>
+
+        
+         {data && data?.map((task) => (<CardWithForm key={task?.id} task={task} currentUser={user} />))}
+
+                      </div>
+          
+             </div>
             </div>
     </div>
   )
