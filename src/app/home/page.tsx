@@ -20,6 +20,7 @@ import { useCurrentUser } from '@/hooks/use-current-user';
 import { getUserCountry } from '@/actions/getUserCountry';
 import { DialogDemo } from '@/components/Modal';
 import { CardWithForm } from '@/components/Card';
+import { UpdateModal } from '@/components/UpdateModal';
 
 
 const Page = () => {
@@ -33,6 +34,9 @@ const { data: session, status } = useSession();
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState<string | null>(user?.country);
   const [error, setError] = useState<string | null>(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
   console.log("this is user from user hook",user);
   console.log("this is country selected by user",country);
 
@@ -100,7 +104,7 @@ const { data: session, status } = useSession();
       
        const data = await response.json()
        setData(data)
-       alert("Data fetched successfully!");
+      //  alert("Data fetched successfully!");
         console.log("this is the data from the user api",data);
   }
     getData();
@@ -192,7 +196,7 @@ const { data: session, status } = useSession();
 
         
          {data && data?.map((task) => (<CardWithForm key={task?.id} task={task} currentUser={user} />))}
-
+                    
                       </div>
           
              </div>

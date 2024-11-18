@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { UpdateModal } from "./UpdateModal"
+import { DeleteModal } from "./deleteModal"
 
 export function CardWithForm({task,currentUser}) {
   return (
@@ -31,8 +33,9 @@ export function CardWithForm({task,currentUser}) {
        
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Edit</Button>
-        <Button>Delete</Button>
+       
+        <UpdateModal initialDescription={task?.work} id={task?.id} />
+        <DeleteModal id={task?.id} />
       </CardFooter>
     </Card>
   )
