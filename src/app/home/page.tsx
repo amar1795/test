@@ -28,7 +28,7 @@ const Page = () => {
   const [country, setCountry] = useState<string | null>(user?.country);
   const [error, setError] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState([]);
-
+  const [updateData, setUpdateData] = useState(false);
   // Fetch countries once on component mount
   useEffect(() => {
     fetch("https://restcountries.com/v3.1/all")
@@ -100,7 +100,8 @@ const Page = () => {
 
   useEffect(() => {
     fetchTaskData();
-  }, [fetchTaskData]);
+    alert("I have been called!");
+  }, [fetchTaskData,updateData]);
 
   const handleCountryChange = async (value: string) => {
     setCountry(value);
@@ -147,7 +148,7 @@ const Page = () => {
           {user?.role === "ADMIN" ? (
             <AdminDialogDemo countries={countries} alluserData={allUsers} />
           ) : (
-            <DialogDemo selectedCountry={country} />
+            <DialogDemo selectedCountry={country} setUpdateData={setUpdateData} />
           )}
         </div>
 
@@ -155,9 +156,9 @@ const Page = () => {
           <h1 className="mb-8 text-[2rem]">
             {data.length === 0 ? "No Tasks" : "Your Tasks"}
           </h1>
-          <div className="flex gap-7">
+          <div className="flex gap-7 flex-wrap">
             {data?.map((task) => (
-              <CardWithForm key={task?.id} task={task} currentUser={user} />
+              <CardWithForm key={task?.id} task={task} currentUser={user} setUpdateData={setUpdateData} />
             ))}
           </div>
         </div>

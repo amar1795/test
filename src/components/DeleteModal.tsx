@@ -16,7 +16,7 @@ import { Textarea } from "./ui/textarea"
 import { use, useEffect, useState } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
 
-export function DeleteModal({id}) {
+export function DeleteModal({id,UpdateData}) {
   const user=useCurrentUser();
   const [open, setOpen] = useState(false); // Control the modal open state
 
@@ -26,10 +26,13 @@ export function DeleteModal({id}) {
   const [role,setRole] = useState(user?.role);
 console.log("this is description",description);
 
-
+  const handleToggle = () => {
+    UpdateData((prev)=>!prev)
+  }
 
 
   const handleSubmit = async () => {
+    handleToggle()
     setOpen(false)
     try {
       const response = await fetch(`/api/data/${id}`, {
@@ -51,6 +54,12 @@ console.log("this is description",description);
       // alert("An unexpected error occurred.");
     }
   };
+
+  
+
+  const handleClose = () => {
+    setOpen(false);
+  }
 
   // useEffect(() => {
 
@@ -78,7 +87,7 @@ console.log("this is description",description);
         
         <DialogFooter>
           <Button type="submit" onClick={handleSubmit} >Yes</Button>
-          <Button type="submit" >No</Button>
+          <Button type="submit" onClick={handleClose}>No</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

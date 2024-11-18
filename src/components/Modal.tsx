@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function DialogDemo({selectedCountry}) {
+export function DialogDemo({selectedCountry,setUpdateData}) {
   const user=useCurrentUser();
   const [open, setOpen] = useState(false); // Control the modal open state
 
@@ -38,6 +38,7 @@ console.log("this is description",description);
 
   const handleSubmit = async () => {
     setOpen(false)
+    setUpdateData((prev)=>!prev)
     try {
       const response = await fetch("/api/data", {
         method: "POST",

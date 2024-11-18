@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -21,7 +22,7 @@ import {
 import { UpdateModal } from "./UpdateModal"
 import { DeleteModal } from "./deleteModal"
 
-export function CardWithForm({task,currentUser}) {
+export function CardWithForm({task,currentUser,setUpdateData}) {
 
   console.log("this is the user and current user", task,currentUser);
   return (
@@ -38,9 +39,9 @@ export function CardWithForm({task,currentUser}) {
 
         {currentUser?.role !=="ADMIN" ? task?.assignedBy ?(<div></div>):( <div className=" flex justify-between  w-full"> 
        <UpdateModal   initialDescription={task?.work} id={task?.id} />
-        <DeleteModal id={task?.id} /></div>):( <div className=" flex justify-between  w-full"> 
+        <DeleteModal id={task?.id} UpdateData={setUpdateData} /></div>):( <div className=" flex justify-between  w-full"> 
        <UpdateModal   initialDescription={task?.work} id={task?.id} />
-        <DeleteModal id={task?.id} /></div>)}
+        <DeleteModal id={task?.id} UpdateData={setUpdateData}  /></div>)}
       
         
       </CardFooter>
