@@ -26,7 +26,7 @@ export function CardWithForm({task,currentUser}) {
     <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Your Task </CardTitle>
-        <p>added by {task?.username === currentUser?.username && "you"} </p>
+        <p>added by {task?.user.name } </p>
         <CardDescription>{task?.work}</CardDescription>
       </CardHeader>
       <CardContent>

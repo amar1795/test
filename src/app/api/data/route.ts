@@ -27,6 +27,27 @@ export async function GET(request: Request) {
     );
   }
 
+  if(session.user.role == "ADMIN"){
+    try {
+      const data = await prismadb.work.findMany({
+        where: { country },
+        include: {
+          user: { // Include the related user data
+            select: {
+              name: true, // Only include the name of the user
+            },
+          },
+        },
+      });
+      return NextResponse.json(data, { status: 200 });
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Failed to fetch data' },
+        { status: 500 }
+      );
+    }
+  }
+
   try {
     const data = await prismadb.work.findMany({
       where: { country,userId:session.user.id },

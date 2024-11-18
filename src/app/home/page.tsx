@@ -37,7 +37,7 @@ const { data: session, status } = useSession();
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  console.log("this is user from user hook",user);
+  console.log("this is user from user hook",user?.name);
   console.log("this is country selected by user",country);
 
 
@@ -117,18 +117,7 @@ const { data: session, status } = useSession();
    
   };
 
-//   useEffect(() => {
 
-//     const getData = async () => {
-//       const response = await fetch('/api/data')
-      
-//        const data = await response.json()
-//        setData(data)
-//       //  alert("Data fetched successfully!");
-//         console.log("this is the data from the user api",data);
-//   }
-//     getData();
-// }, [country]);
 
 
 

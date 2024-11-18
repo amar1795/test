@@ -48,16 +48,16 @@ console.log("this is description",description);
       if (!response.ok) {
         const error = await response.json();
         console.error("Error creating data:", error);
-        alert(`Failed to create data: ${error.error}`);
+        // alert(`Failed to create data: ${error.error}`);
         return;
       }
 
       const result = await response.json();
       console.log("Data created successfully:", result);
-      alert("Data created successfully!");
+      // alert("Data created successfully!");
     } catch (error) {
       console.error("An error occurred:", error);
-      alert("An unexpected error occurred.");
+      // alert("An unexpected error occurred.");
     }
   };
 

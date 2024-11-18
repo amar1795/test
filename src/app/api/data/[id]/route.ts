@@ -49,7 +49,7 @@ export async function PUT(request: Request, { params }) {
         );
       }
   
-      if (existingWork.userId !== session.user.id ) {
+      if (existingWork.userId !== session.user.id && session.user.role !== 'ADMIN' ) {
         return NextResponse.json(
           { error: 'Work does not belong to the current user ' },
           { status: 403 }
@@ -112,7 +112,7 @@ export async function DELETE(request: Request, { params }) {
       }
   
       // user cannot delete the work of admin
-      if(existingWork.userId == "admin" && session.user.role !== "admin"){
+      if(existingWork.role == "ADMIN" ){
 
         return NextResponse.json(
           { error: 'Only admin can delete the work' },
@@ -120,12 +120,14 @@ export async function DELETE(request: Request, { params }) {
         );
       }
 
-      if (existingWork.userId !== session.user.id ) {
+      if (existingWork.userId !== session.user.id && session.user.role !== 'ADMIN' ) {
         return NextResponse.json(
           { error: 'Work does not belong to the current user or country' },
           { status: 403 }
         );
       }
+
+      
   
       // Delete the work entry
       await prismadb.work.delete({
