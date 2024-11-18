@@ -105,15 +105,16 @@ export function TabsDemo() {
         .then((data) => {
           if (data?.error) {
             // reset();
-            alert(data.error);
+            // alert(data.error);
             setError(data.error);
           }
 
           if (data?.success) {
+            console.log("this is the data",data);
+            // alert("redirection successfull");
             loginreset();
-            alert("redirection successfull");
             setSuccess(data.success);
-            redirect(`/home`) // Navigate to the new post page
+            // redirect(`/home`) // Navigate to the new post page
           }
 
         })
@@ -145,7 +146,7 @@ export function TabsDemo() {
 
   useEffect(() => {
     if (error) {
-      alert(error);
+      // alert(error);
     }
     if (success) {
       setIsSignup(false);

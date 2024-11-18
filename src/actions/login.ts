@@ -44,7 +44,7 @@ export const login = async (
     await signIn("credentials", {
       username,
       password,
-      redirectTo:callbackUrl || DEFAULT_LOGIN_REDIRECT ,
+      redirectTo:DEFAULT_LOGIN_REDIRECT ,
     });
     return { success: "Logged in!" };
   } catch (error) {

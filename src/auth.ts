@@ -27,9 +27,8 @@ export const {
   update,
 } = NextAuth({
   pages: {
-    signIn: "/login",
-  },
-  events: {
+    signIn: "/",
+  }, events: {
     async linkAccount({ user }) {
       await prismadb.user.update({
         where: { id: user.id },
@@ -41,7 +40,7 @@ export const {
   callbacks: {
     async signIn({ user, account }) {
     
-      if (account.provider === "credentials") {
+      if (account?.provider === "credentials") {
         return true;
       }
 
@@ -60,7 +59,8 @@ export const {
 
 
       if (session.user) {
-        session.user.name = token.username as string;
+        session.user.name = token.name as string;
+        session.user.country = token.country as string;
       }
 
       return session;
@@ -76,6 +76,7 @@ export const {
 
       token.name = existingUser.name;
       token.role = existingUser.role;
+      token.country = existingUser.country;
 
       return token;
 
