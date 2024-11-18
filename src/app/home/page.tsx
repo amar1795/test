@@ -1,12 +1,11 @@
 "use client";
 
-import React, { use } from 'react'
+import React, { use } from "react";
 import { signOut } from "next-auth/react";
-import { logout } from '@/actions/logout';
-import { redirect, useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button"
+import { logout } from "@/actions/logout";
+import { redirect, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
-
 
 import { useEffect, useState } from "react";
 import {
@@ -16,17 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCurrentUser } from '@/hooks/use-current-user';
-import { getUserCountry } from '@/actions/getUserCountry';
-import { DialogDemo } from '@/components/Modal';
-import { CardWithForm } from '@/components/Card';
-import { UpdateModal } from '@/components/UpdateModal';
-
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { getNonAdminUsers, getUserCountry } from "@/actions/getUserCountry";
+import { DialogDemo } from "@/components/Modal";
+import { CardWithForm } from "@/components/Card";
+import { UpdateModal } from "@/components/UpdateModal";
+import { AdminDialogDemo } from "@/components/AdminModal";
 
 const Page = () => {
-
-const { data: session, status } = useSession();
-  const user=useCurrentUser();
+  const { data: session, status } = useSession();
+  const user = useCurrentUser();
 
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,23 +34,23 @@ const { data: session, status } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [allusers, setAllUsers] = useState([]);
 
-  console.log("this is user from user hook",user?.name);
-  console.log("this is country selected by user",country);
-
-
-
+  console.log("this is user from user hook", user);
+  console.log("this is country selected by user", country);
 
   useEffect(() => {
     const getData = async () => {
-      
-      if(user){
-    const data= await getUserCountry(user?.id);
-    setUserCountry(data);
+      if (user) {
+        const data = await getUserCountry(user?.id);
+        setUserCountry(data);
+        const alluserData = await getNonAdminUsers();
+        console.log("this is all users Data", alluserData);
+        setAllUsers(alluserData);
       }
-    }
+    };
     getData();
-  } ,[user]);
+  }, [user]);
 
   useEffect(() => {
     // Fetch countries from RestCountries API
@@ -65,133 +63,130 @@ const { data: session, status } = useSession();
       .catch((error) => console.error("Error fetching countries:", error));
   }, []);
 
-
-
   const updateUserCountry = async () => {
-    setIsLoading(true)
-    setError(null)
-    
-    try {
-      const response = await fetch('/api/user/country', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ country: country })
-      })
+    setIsLoading(true);
+    setError(null);
 
-      const data = await response.json()
-      
+    try {
+      const response = await fetch("/api/user/country", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ country: country }),
+      });
+
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to update country')
+        throw new Error(data.message || "Failed to update country");
       }
 
-      console.log("User updated successfully:", data.user)
+      console.log("User updated successfully:", data.user);
       // You can update your UI state here
-      
     } catch (error) {
-      console.error("Error updating country:", error)
-      setError(error instanceof Error ? error.message : 'Failed to update country')
+      console.error("Error updating country:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to update country"
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  useEffect(() => {
-    updateUserCountry()
-    const getData = async () => {
-      const response = await fetch('/api/data')
-      
-       const data = await response.json()
-       setData(data)
-      //  alert("Data fetched successfully!");
-        console.log("this is the data from the user api",data);
-  }
-    getData();
-  }, [country])
-
-  
-  const initiateLogout = async () => {
-    
-   await signOut({ redirect: true, callbackUrl: "/" });
-   
   };
 
+  useEffect(() => {
+    updateUserCountry();
+    const getData = async () => {
+      const response = await fetch("/api/data");
 
+      const data = await response.json();
+      setData(data);
+      //  alert("Data fetched successfully!");
+      console.log("this is the data from the user api", data);
+    };
+    getData();
+  }, [country]);
 
-
+  const initiateLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/" });
+  };
 
   return (
     <div>
       {/* <h1>This is Home</h1> */}
       <div className="">
-           <div>
-           <div className=" bg-black w-full h-[4rem] text-white ">
-          <div className=" flex justify-between">
-            <div>
-
-            </div>
-            <div>
-            </div>
-          <div className="flex flex-row justify-between text-center  w-[15rem]  space-y-1.5 mr-[5rem] pt-3  ">
-               
-            
+        <div>
+          <div className=" bg-black w-full h-[4rem] text-white ">
+            <div className=" flex justify-between">
+              <div></div>
+              <div></div>
+              <div className="flex flex-row justify-between text-center  w-[15rem]  space-y-1.5 mr-[5rem] pt-3  ">
                 <div className="w-[10rem] pt-1.5 ">
-                <Select 
-                 onValueChange={(value) => setCountry(value)}
-                //  value={watch("country")} // Add this to sync with form state
->
-                  <SelectTrigger id="framework">
-                    <SelectValue placeholder={usercountry === null ? "loading":usercountry}  />
-                  </SelectTrigger>
+                  <Select
+                    onValueChange={(value) => setCountry(value)}
+                    //  value={watch("country")} // Add this to sync with form state
+                  >
+                    <SelectTrigger id="framework">
+                      <SelectValue
+                        placeholder={
+                          usercountry === null ? "loading" : usercountry
+                        }
+                      />
+                    </SelectTrigger>
 
-                  <SelectContent position="popper"  >
-                    {countries.length > 0 && (
-                      <>
-                        {countries.map((country, index) => (
-                          <SelectItem
-                            value={country}
-                            key={index}
- 
-                          >
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-                  </SelectContent>
-              
-                </Select>
+                    <SelectContent position="popper">
+                      {countries.length > 0 && (
+                        <>
+                          {countries.map((country, index) => (
+                            <SelectItem value={country} key={index}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
-                
-                <Button className=' bg-white text-black hover:bg-red-600 ' onClick={() => initiateLogout()}>Logout</Button>
-                
+
+                <Button
+                  className=" bg-white text-black hover:bg-red-600 "
+                  onClick={() => initiateLogout()}
+                >
+                  Logout
+                </Button>
               </div>
+            </div>
           </div>
         </div>
-           </div>
-            </div>
+      </div>
 
-            <div>
-             <div className=' mt-7 ml-8'>
+      <div>
+        <div className=" mt-7 ml-8">
+          {user?.role === "ADMIN" ? (
+            <AdminDialogDemo countries={countries} alluserData={allusers} />
+          ) : (
             <DialogDemo selectedCountry={country} />
-             </div>
-              
-             <div className=' mt-6 ml-7'>
+          )}
+          {/* <DialogDemo selectedCountry={country} /> */}
+        </div>
 
-              { (data.length === 0) ?(<h1 className=' mb-8 text-[2rem]'>No Tasks</h1>):<h1 className=' mb-8 text-[2rem]'>Your Tasks</h1>}
-          
-          <div className=' flex gap-7'>
+        <div className=" mt-6 ml-7">
+          {data.length === 0 ? (
+            <h1 className=" mb-8 text-[2rem]">No Tasks</h1>
+          ) : (
+            <h1 className=" mb-8 text-[2rem]">Your Tasks</h1>
+          )}
 
-        
-         {data && data?.map((task) => (<CardWithForm key={task?.id} task={task} currentUser={user} />))}
-                    
-                      </div>
-          
-             </div>
-            </div>
+          <div className=" flex gap-7">
+            {data &&
+              data?.map((task) => (
+                <CardWithForm key={task?.id} task={task} currentUser={user} />
+              ))}
+          </div>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

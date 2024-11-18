@@ -22,20 +22,27 @@ import { UpdateModal } from "./UpdateModal"
 import { DeleteModal } from "./deleteModal"
 
 export function CardWithForm({task,currentUser}) {
+
+  console.log("this is the user and current user", task,currentUser);
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Your Task </CardTitle>
-        <p>added by {task?.user.name } </p>
+        <CardTitle> Task </CardTitle>
+        {currentUser?.role === "ADMIN" ?(<p>added by {task?.assignedBy === currentUser?.id ?"You":task?.user?.name } </p>):(<p>added by {task?.assignedBy ? "Admin":task?.user?.name}</p>)}
         <CardDescription>{task?.work}</CardDescription>
       </CardHeader>
       <CardContent>
        
       </CardContent>
       <CardFooter className="flex justify-between">
-       
-        <UpdateModal initialDescription={task?.work} id={task?.id} />
-        <DeleteModal id={task?.id} />
+
+        {currentUser.role !=="ADMIN" ? task?.assignedBy ?(<div></div>):( <div className=" flex justify-between  w-full"> 
+       <UpdateModal   initialDescription={task?.work} id={task?.id} />
+        <DeleteModal id={task?.id} /></div>):( <div className=" flex justify-between  w-full"> 
+       <UpdateModal   initialDescription={task?.work} id={task?.id} />
+        <DeleteModal id={task?.id} /></div>)}
+      
+        
       </CardFooter>
     </Card>
   )

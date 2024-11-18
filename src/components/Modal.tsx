@@ -15,6 +15,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui/textarea"
 import { use, useEffect, useState } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function DialogDemo({selectedCountry}) {
   const user=useCurrentUser();
@@ -108,6 +115,7 @@ console.log("this is description",description);
               className="col-span-3"
               disabled
             />
+            
           </div>
           <div className="">
             <Label htmlFor="username" className="text-right" >

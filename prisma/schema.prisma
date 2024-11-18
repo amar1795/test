@@ -27,7 +27,9 @@ model User {
   password              String?
   role                  UserRole               @default(USER)
   country              String?
-  Work Work[]
+  Work        Work[]   @relation("UserTasks")
+  AssignedTasks Work[] @relation("AdminAssignedTasks")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -37,12 +39,18 @@ model Work {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId // Reference to User ID
   role      UserRole
+  assignedBy  String?  @db.ObjectId // Reference to the admin who assigned the task
   country   String
   work      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+ user        User     @relation("UserTasks", fields: [userId], references: [id])
+ admin       User?    @relation("AdminAssignedTasks", fields: [assignedBy], references: [id])
+
+
 
   @@index([userId]) // Index for faster queries based on userId
+    @@index([assignedBy]) // Index for faster queries based on assignedBy
+
 }
