@@ -58,7 +58,7 @@ export function DialogDemo({selectedCountry,setUpdateData}) {
     
     setUpdateData((prev)=>!prev)
     try {
-      const response = await fetch("/api/data", {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

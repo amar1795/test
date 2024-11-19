@@ -64,7 +64,7 @@ const Page = () => {
     setError(null);
 
     try {
-      const response = await fetch("/api/user/country", {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/user/country`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +94,7 @@ const Page = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/data");
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data`);
       const taskData = await response.json();
       setData(taskData);
       setIsLoading(false);

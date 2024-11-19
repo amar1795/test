@@ -22,5 +22,9 @@ module.exports = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  
   swcMinify: false,
+  env: {
+    MAIN_DOMAIN: process.env.MAIN_DOMAIN,
+  },
 }

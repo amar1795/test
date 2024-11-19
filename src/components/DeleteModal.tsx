@@ -47,7 +47,7 @@ const toastAction = ({varient,title,description}) => {
    
     setOpen(false)
     try {
-      const response = await fetch(`/api/data/${id}`, {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data/${id}`, {
         method: "DELETE",
       });
 

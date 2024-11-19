@@ -63,7 +63,7 @@ const toastAction = ({varient,title,description}) => {
     setUpdateData((prev)=>!prev)
 
     try {
-      const response = await fetch("/api/admin", {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/admin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

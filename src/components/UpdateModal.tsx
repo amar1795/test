@@ -61,7 +61,7 @@ console.log("this is intial description",initialDescription);
       });
     }
     try {
-      const response = await fetch(`/api/data/${id}`, {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
