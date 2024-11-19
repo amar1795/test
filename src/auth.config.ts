@@ -1,11 +1,10 @@
 import bcrypt from "bcryptjs";
 
 import type { NextAuthConfig } from "next-auth";
+
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 
-import * as z from "zod";
-import { prismadb } from "@/lib/db";
 import { LoginSchema } from "@/schemas";
 import { getUserByUsername } from "./actions/login";
 
