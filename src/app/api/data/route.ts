@@ -39,6 +39,7 @@ export async function GET(request: Request) {
           },
         },
       });
+      // console.log("this is the data fetched",data);
       return NextResponse.json(data, { status: 200 });
     } catch (error) {
       return NextResponse.json(

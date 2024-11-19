@@ -54,7 +54,7 @@ const toastAction = ({varient,title,description}) => {
       if (!response.ok) {
         const error = await response.json();
         console.error("Error deleting data:", error);
-        alert(`Failed to delete data: ${error.error}`);
+        // alert(`Failed to delete data: ${error.error}`);
         return toastAction({
           varient: "destructive", 
           title: "Error",
@@ -69,7 +69,7 @@ const toastAction = ({varient,title,description}) => {
         title: "Task Deleted",
         description: "Your Task has been successfully Deleted",
       });
-      alert("Task Deleted Successfully")
+      // alert("Task Deleted Successfully")
       const result = await response.json();
      
       console.log("Data deleted successfully:", result);

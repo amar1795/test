@@ -29,16 +29,19 @@ export function CardWithForm({task,currentUser,setUpdateData}) {
     <Card className="w-[350px]">
       <CardHeader>
         <CardTitle> Task </CardTitle>
-        {currentUser?.role === "ADMIN" ?(<p>added by {task?.assignedBy === currentUser?.id ?"You":task?.user?.name } </p>):(<p>added by {task?.assignedBy ? "Admin":task?.user?.name}</p>)}
-        <CardDescription>{task?.work}</CardDescription>
+        {currentUser?.role === "ADMIN" ?(<CardDescription>added by {task?.assignedBy === currentUser?.id ?"You":task?.user?.name } </CardDescription>):(<p>added by {task?.assignedBy ? "Admin":"you"}</p>)}
+        {currentUser?.role ==="ADMIN" && task?.assignedBy &&  (<p className=" text-gray-600">assigned to {task?.user?.name}</p>)}
+        <p>{task?.work}</p>
+
       </CardHeader>
       <CardContent>
        
-      </CardContent>
+       </CardContent>    
       <CardFooter className="flex justify-between">
 
         {currentUser?.role !=="ADMIN" ? task?.assignedBy ?(<div></div>):( <div className=" flex justify-between  w-full"> 
        <UpdateModal UpdateData={setUpdateData}   initialDescription={task?.work} id={task?.id} />
+         
         <DeleteModal id={task?.id} UpdateData={setUpdateData} /></div>):( <div className=" flex justify-between  w-full"> 
        <UpdateModal  UpdateData={setUpdateData}  initialDescription={task?.work} id={task?.id} />
         <DeleteModal id={task?.id} UpdateData={setUpdateData}  /></div>)}

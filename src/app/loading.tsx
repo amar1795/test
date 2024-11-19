@@ -1,10 +1,11 @@
+import Spinner from '@/components/spinner/Spinner'
 import React from 'react'
 
 const loading = () => {
   return (
     <div>
-      <h1 className=' text-[5rem]'>Loading...</h1>
-    </div>
+    <div className=" text-[2rem] flex w-full justify-center "><Spinner/></div>
+   </div>
   )
 }
 

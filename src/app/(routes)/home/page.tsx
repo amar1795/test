@@ -17,6 +17,7 @@ import { DialogDemo } from "@/components/Modal";
 import { CardWithForm } from "@/components/Card";
 import { AdminDialogDemo } from "@/components/AdminModal";
 import { ToastDemo } from "@/components/CustomToast";
+import Spinner from "@/components/spinner/Spinner";
 
 const Page = () => {
   const { data: session } = useSession();
@@ -90,10 +91,14 @@ const Page = () => {
 
   // Fetch task data
   const fetchTaskData = useCallback(async () => {
+    setIsLoading(true);
+
     try {
       const response = await fetch("/api/data");
       const taskData = await response.json();
       setData(taskData);
+      setIsLoading(false);
+
     } catch (error) {
       console.error("Error fetching task data:", error);
     }
@@ -101,6 +106,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchTaskData();
+    
   }, [fetchTaskData,updateData]);
 
   const handleCountryChange = async (value: string) => {
@@ -109,6 +115,8 @@ const Page = () => {
   };
 
   const initiateLogout = () => signOut({ redirect: true, callbackUrl: "/" });
+
+
 
   return (
     <div>
@@ -150,17 +158,20 @@ const Page = () => {
           ) : (
             <DialogDemo selectedCountry={country} setUpdateData={setUpdateData} />
           )}
-          {/* <ToastDemo/> */}
         </div>
 
         <div className="mt-6 ml-7">
           <h1 className="mb-8 text-[2rem]">
             {data.length === 0 ? "No Tasks" : "Your Tasks"}
           </h1>
+          
           <div className="flex gap-7 flex-wrap">
-            {data?.map((task) => (
+
+          {isLoading ? <div className=" text-[2rem] flex w-full justify-center "><Spinner/></div>:(<>
+            {data.length !== 0 && data?.map((task) => (
               <CardWithForm key={task?.id} task={task} currentUser={user} setUpdateData={setUpdateData} />
-            ))}
+            ))}</>)}
+           
           </div>
         </div>
       </div>
