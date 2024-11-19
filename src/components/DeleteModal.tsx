@@ -27,7 +27,7 @@ export function DeleteModal({id,UpdateData}) {
   const [country,setCountry ] = useState(user?.country);
   const [description,setDescription] = useState("");
   const [role,setRole] = useState(user?.role);
-console.log("this is description",description);
+// console.log("this is description",description);
 
 const toastAction = ({varient,title,description}) => {
   toast({
@@ -72,7 +72,7 @@ const toastAction = ({varient,title,description}) => {
       // alert("Task Deleted Successfully")
       const result = await response.json();
      
-      console.log("Data deleted successfully:", result);
+      // console.log("Data deleted successfully:", result);
     } catch (error) {
       console.error("An error occurred:", error);
       toastAction({

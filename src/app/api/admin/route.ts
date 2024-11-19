@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { id, description, country, role, assignedBy } = body; // Include `assignedBy`
-    console.log("this is the body",body);
+    // console.log("this is the body",body);
     // Validate required fields
     if (!id || !description || !country || !role || !assignedBy) {
       return NextResponse.json(

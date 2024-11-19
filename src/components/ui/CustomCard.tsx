@@ -30,6 +30,7 @@ import { register } from "@/actions/register";
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { login } from "@/actions/login";
+import { useToast } from "@/hooks/use-toast";
 
 export function TabsDemo() {
   const [countries, setCountries] = useState([]);
@@ -40,7 +41,15 @@ export function TabsDemo() {
   const [isPending, startTransition] = useTransition();
   const [isSignup, setIsSignup] = useState(false);
 
+  const { toast } = useToast()
 
+  const toastAction = ({varient,title,description}) => {
+    toast({
+      variant: varient,
+      title: title,
+      description: description,
+    })
+  }
 
   useEffect(() => {
     // Fetch countries from RestCountries API
@@ -53,19 +62,35 @@ export function TabsDemo() {
       .catch((error) => console.error("Error fetching countries:", error));
   }, []);
 
+  const callToast = () => {
+    toastAction({
+      varient: "success", // or "error", "info", etc., depending on your toast implementation
+      title: "Account Created",
+      description: "Your Account has been successfully created please log in",
+    });
+  }
+
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
-
+    
     startTransition(() => {
       register(values).then((data) => {
         setError(data.error);
-        setSuccess(data.success);
+
+        if (data?.success) {
+          callToast()
+          setSuccess(data.success);
+          // redirect(`/home`) // Navigate to the new post page
+        }
+
       });
 
       
     });
+
+ 
   };
 
   const {
@@ -99,7 +124,7 @@ export function TabsDemo() {
           }
 
           if (data?.success) {
-            console.log("this is the data",data);
+            // console.log("this is the data",data);
             // alert("redirection successfull");
             loginreset();
             setSuccess(data.success);
@@ -304,7 +329,8 @@ const ADMIN_CREDENTIALS = {
                 )}
             </CardContent>
             <CardFooter>
-              <Button>Create Account</Button>
+              <Button disabled={isPending}>{isPending ? "Creating Account..." : "Create Acount"}
+              </Button>
             </CardFooter>
           </form>
         </Card>

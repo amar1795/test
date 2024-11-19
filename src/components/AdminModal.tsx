@@ -35,7 +35,7 @@ export const AdminDialogDemo= React.memo(({countries,alluserData,setUpdateData})
   const [selectedUserId,setselectedUserId] = useState(null);
   const [selectedUserRole,setselectedUserRole] = useState(null);
 // console.log("this is all user data",alluserData);
-console.log("this is the selected user role ",selectedUserRole);
+// console.log("this is the selected user role ",selectedUserRole);
 
 const { toast } = useToast()
 
@@ -89,7 +89,7 @@ const toastAction = ({varient,title,description}) => {
       }
 
       const result = await response.json();
-      console.log("Data created successfully:", result);
+      // console.log("Data created successfully:", result);
       toastAction({
         varient: "success", // or "error", "info", etc., depending on your toast implementation
         title: "Task Created",

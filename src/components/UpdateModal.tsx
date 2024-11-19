@@ -31,10 +31,10 @@ export function UpdateModal({initialDescription,id,UpdateData}) {
   const [role,setRole] = useState(user?.role);
   const { toast } = useToast()
 
-console.log("this is intial description",initialDescription);
+// console.log("this is intial description",initialDescription);
 
   // const id= user?.id;
-  console.log("this is current work id",id);
+  // console.log("this is current work id",id);
 
   const toastAction = ({varient,title,description}) => {
     toast({
@@ -85,7 +85,7 @@ console.log("this is intial description",initialDescription);
         title: "Task Updated",
         description: "Your Task has been successfully Updated",
       });
-      console.log("Data created successfully:", result);
+      // console.log("Data created successfully:", result);
       // alert("Data updated successfully!");
     } catch (error) {
       console.error("An error occurred:", error);

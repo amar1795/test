@@ -24,7 +24,7 @@ import { DeleteModal } from "./DeleteModal"
 
 export function CardWithForm({task,currentUser,setUpdateData}) {
 
-  console.log("this is the user and current user", task,currentUser);
+  // console.log("this is the user and current user", task,currentUser);
   return (
     <Card className="w-[350px]">
       <CardHeader>
