@@ -38,9 +38,9 @@ export function CardWithForm({task,currentUser,setUpdateData}) {
       <CardFooter className="flex justify-between">
 
         {currentUser?.role !=="ADMIN" ? task?.assignedBy ?(<div></div>):( <div className=" flex justify-between  w-full"> 
-       <UpdateModal   initialDescription={task?.work} id={task?.id} />
+       <UpdateModal UpdateData={setUpdateData}   initialDescription={task?.work} id={task?.id} />
         <DeleteModal id={task?.id} UpdateData={setUpdateData} /></div>):( <div className=" flex justify-between  w-full"> 
-       <UpdateModal   initialDescription={task?.work} id={task?.id} />
+       <UpdateModal  UpdateData={setUpdateData}  initialDescription={task?.work} id={task?.id} />
         <DeleteModal id={task?.id} UpdateData={setUpdateData}  /></div>)}
       
         

@@ -27,12 +27,13 @@ export function DeleteModal({id,UpdateData}) {
 console.log("this is description",description);
 
   const handleToggle = () => {
+    // alert("Task Deleted Successfully")
     UpdateData((prev)=>!prev)
   }
 
 
   const handleSubmit = async () => {
-    handleToggle()
+   
     setOpen(false)
     try {
       const response = await fetch(`/api/data/${id}`, {
@@ -53,6 +54,7 @@ console.log("this is description",description);
       console.error("An error occurred:", error);
       // alert("An unexpected error occurred.");
     }
+    handleToggle()
   };
 
   

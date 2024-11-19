@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { id, description, country,role } = body; // Ensure these fields exist in the request body
-
+    console.log("this is the body for adding the nwe work",body);
     if (!id || !description || !country || !role) {
       return NextResponse.json(
         { error: 'Name, description, and country are required' },

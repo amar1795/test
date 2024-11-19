@@ -100,7 +100,6 @@ const Page = () => {
 
   useEffect(() => {
     fetchTaskData();
-    alert("I have been called!");
   }, [fetchTaskData,updateData]);
 
   const handleCountryChange = async (value: string) => {

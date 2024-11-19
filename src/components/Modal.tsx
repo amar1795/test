@@ -31,13 +31,14 @@ export function DialogDemo({selectedCountry,setUpdateData}) {
   const [country,setCountry ] = useState(user?.country);
   const [description,setDescription] = useState("");
   const [role,setRole] = useState(user?.role);
-console.log("this is description",description);
+  console.log("this is description",description);
 
 
 
 
   const handleSubmit = async () => {
     setOpen(false)
+    
     setUpdateData((prev)=>!prev)
     try {
       const response = await fetch("/api/data", {
@@ -70,13 +71,9 @@ console.log("this is description",description);
   };
 
   useEffect(() => {
-
-    // to fetch the user data from the api
-    const getData = async () => {
+setCountry(selectedCountry)
    
-    }
-    getData();
-  } ,[user]);
+  } ,[selectedCountry]);
  
   const handleChange = (event) => {
     setDescription(event.target.value); // Update the state with the textarea value

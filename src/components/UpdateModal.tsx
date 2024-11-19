@@ -18,7 +18,7 @@ import { useCurrentUser } from "@/hooks/use-current-user"
 
 
 
-export function UpdateModal({initialDescription,id}) {
+export function UpdateModal({initialDescription,id,UpdateData}) {
 
   const user=useCurrentUser();
 
@@ -32,6 +32,12 @@ console.log("this is intial description",initialDescription);
 
   // const id= user?.id;
   console.log("this is current work id",id);
+
+
+  const handleToggle = () => {
+    // alert("Task Deleted Successfully")
+    UpdateData((prev)=>!prev)
+  }
 
 
   const handleSubmit = async () => {
@@ -62,6 +68,8 @@ console.log("this is intial description",initialDescription);
       console.error("An error occurred:", error);
       // alert("An unexpected error occurred.");
     }
+
+    handleToggle()
   };
 
   useEffect(() => {
