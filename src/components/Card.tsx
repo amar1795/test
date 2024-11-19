@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { UpdateModal } from "./UpdateModal"
-import { DeleteModal } from "./deleteModal"
+import { DeleteModal } from "./DeleteModal"
 
 export function CardWithForm({task,currentUser,setUpdateData}) {
 
