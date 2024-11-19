@@ -42,19 +42,6 @@ export function TabsDemo() {
 
 
 
-
-   // Function to toggle between signup and login
- const toggleView = () => {
-  setIsSignup((prev) => {
-    const newState = !prev;
-    // Save the new state to local storage
-    localStorage.setItem('isSignup', JSON.stringify(newState));
-    return newState;
-  });
-};
-
-
-
   useEffect(() => {
     // Fetch countries from RestCountries API
     fetch("https://restcountries.com/v3.1/all")
@@ -86,6 +73,8 @@ export function TabsDemo() {
     handleSubmit: loginhandleSubmit,
     formState: { errors: loginerrors },
     reset:loginreset,
+    setValue: setLoginValue
+
   } = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -155,6 +144,33 @@ export function TabsDemo() {
     }
   }, [error, success,setIsSignup]);
 
+const ADMIN_CREDENTIALS = {
+  username: "Mark",
+  password: "123456" 
+};
+
+
+  const handleAdminLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    // setLoginValue("username", ADMIN_CREDENTIALS.username);
+    // setLoginValue("password", ADMIN_CREDENTIALS.password);
+    
+    startTransition(() => {
+      login(ADMIN_CREDENTIALS)
+        .then((data) => {
+          if (data?.error) {
+            setError(data.error);
+          }
+          if (data?.success) {
+            loginreset();
+            setSuccess(data.success);
+          }
+        })
+        .catch(() => setError("Something went wrong"));
+    });
+  };
+
+
 
 
 
@@ -195,7 +211,20 @@ export function TabsDemo() {
                 )}
           </CardContent>
           <CardFooter>
-            <Button>Login</Button>
+            <div className=" flex w-full justify-between">
+            <div className="flex w-full justify-between">
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Logging in..." : "Login"}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleAdminLogin}
+                  disabled={isPending}
+                >
+                  {isPending ? "Logging in..." : "Login as Admin"}
+                </Button>
+              </div>
+            </div>
           </CardFooter>
           </form>
         </Card>
