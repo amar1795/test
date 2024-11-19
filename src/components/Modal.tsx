@@ -22,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast"
+import { title } from "process"
 
 export function DialogDemo({selectedCountry,setUpdateData}) {
   const user=useCurrentUser();
@@ -32,11 +34,26 @@ export function DialogDemo({selectedCountry,setUpdateData}) {
   const [description,setDescription] = useState("");
   const [role,setRole] = useState(user?.role);
   console.log("this is description",description);
+  const { toast } = useToast()
 
-
-
+  const toastAction = ({varient,title,description}) => {
+    toast({
+      variant: varient,
+      title: title,
+      description: description,
+    })
+  }
 
   const handleSubmit = async () => {
+   
+    if(description === "" || country === "" || role === ""){
+      
+      return  toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: "Please fill all the fields",
+      });
+    }
     setOpen(false)
     
     setUpdateData((prev)=>!prev)
@@ -63,16 +80,27 @@ export function DialogDemo({selectedCountry,setUpdateData}) {
 
       const result = await response.json();
       console.log("Data created successfully:", result);
-      // alert("Data created successfully!");
+      toastAction({
+        varient: "success", // or "error", "info", etc., depending on your toast implementation
+        title: "Task Created",
+        description: "Your Task has been successfully created",
+      });
+      setDescription("")
     } catch (error) {
       console.error("An error occurred:", error);
+      toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: error,
+      });
+
       // alert("An unexpected error occurred.");
     }
   };
 
   useEffect(() => {
 setCountry(selectedCountry)
-   
+// toastAction()
   } ,[selectedCountry]);
  
   const handleChange = (event) => {

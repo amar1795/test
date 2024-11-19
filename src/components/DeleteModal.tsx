@@ -15,9 +15,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui/textarea"
 import { use, useEffect, useState } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import { useToast } from "@/hooks/use-toast"
 
 export function DeleteModal({id,UpdateData}) {
   const user=useCurrentUser();
+  const { toast } = useToast()
+
   const [open, setOpen] = useState(false); // Control the modal open state
 
   const [name, setName] = useState(user?.name);
@@ -25,6 +28,14 @@ export function DeleteModal({id,UpdateData}) {
   const [description,setDescription] = useState("");
   const [role,setRole] = useState(user?.role);
 console.log("this is description",description);
+
+const toastAction = ({varient,title,description}) => {
+  toast({
+    variant: varient,
+    title: title,
+    description: description,
+  })
+}
 
   const handleToggle = () => {
     // alert("Task Deleted Successfully")
@@ -43,16 +54,32 @@ console.log("this is description",description);
       if (!response.ok) {
         const error = await response.json();
         console.error("Error deleting data:", error);
-        // alert(`Failed to delete data: ${error.error}`);
-        return;
+        alert(`Failed to delete data: ${error.error}`);
+        return toastAction({
+          varient: "destructive", 
+          title: "Error",
+          description: error,
+        });
+
+        
       }
 
+      toastAction({
+        varient: "success", 
+        title: "Task Deleted",
+        description: "Your Task has been successfully Deleted",
+      });
+      alert("Task Deleted Successfully")
       const result = await response.json();
+     
       console.log("Data deleted successfully:", result);
-      // alert("Data deleted successfully!");
     } catch (error) {
       console.error("An error occurred:", error);
-      // alert("An unexpected error occurred.");
+      toastAction({
+        varient: "destructive", 
+        title: "Error",
+        description: error,
+      });
     }
     handleToggle()
   };
@@ -63,14 +90,6 @@ console.log("this is description",description);
     setOpen(false);
   }
 
-  // useEffect(() => {
-
-  //   // to fetch the user data from the api
-  //   const getData = async () => {
-   
-  //   }
-  //   getData();
-  // } ,[user]);
  
   const handleChange = (event) => {
     setDescription(event.target.value); // Update the state with the textarea value

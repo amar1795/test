@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui/textarea"
 import { use, useEffect, useState } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import { useToast } from "@/hooks/use-toast"
 
 
 
@@ -28,11 +29,20 @@ export function UpdateModal({initialDescription,id,UpdateData}) {
   const [country,setCountry ] = useState(user?.country);
   const [description,setDescription] = useState(initialDescription);
   const [role,setRole] = useState(user?.role);
+  const { toast } = useToast()
+
 console.log("this is intial description",initialDescription);
 
   // const id= user?.id;
   console.log("this is current work id",id);
 
+  const toastAction = ({varient,title,description}) => {
+    toast({
+      variant: varient,
+      title: title,
+      description: description,
+    })
+  }
 
   const handleToggle = () => {
     // alert("Task Deleted Successfully")
@@ -42,6 +52,14 @@ console.log("this is intial description",initialDescription);
 
   const handleSubmit = async () => {
     setOpen(false)
+
+    if(description === ""){
+      return  toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: "Please fill all the fields",
+      });
+    }
     try {
       const response = await fetch(`/api/data/${id}`, {
         method: "PUT",
@@ -62,24 +80,33 @@ console.log("this is intial description",initialDescription);
       }
 
       const result = await response.json();
+      toastAction({
+        varient: "success", // or "error", "info", etc., depending on your toast implementation
+        title: "Task Updated",
+        description: "Your Task has been successfully Updated",
+      });
       console.log("Data created successfully:", result);
       // alert("Data updated successfully!");
     } catch (error) {
       console.error("An error occurred:", error);
-      // alert("An unexpected error occurred.");
+      toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: error,
+      });
     }
 
     handleToggle()
   };
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    // to fetch the user data from the api
-    const getData = async () => {
+  //   // to fetch the user data from the api
+  //   const getData = async () => {
    
-    }
-    getData();
-  } ,[user]);
+  //   }
+  //   getData();
+  // } ,[user]);
  
   const handleChange = (event) => {
     setDescription(event.target.value); // Update the state with the textarea value

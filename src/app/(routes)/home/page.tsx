@@ -16,6 +16,7 @@ import { getNonAdminUsers, getUserCountry } from "@/actions/getUserCountry";
 import { DialogDemo } from "@/components/Modal";
 import { CardWithForm } from "@/components/Card";
 import { AdminDialogDemo } from "@/components/AdminModal";
+import { ToastDemo } from "@/components/CustomToast";
 
 const Page = () => {
   const { data: session } = useSession();
@@ -145,10 +146,11 @@ const Page = () => {
       <div>
         <div className="mt-7 ml-8">
           {user?.role === "ADMIN" ? (
-            <AdminDialogDemo countries={countries} alluserData={allUsers} />
+            <AdminDialogDemo countries={countries} alluserData={allUsers} setUpdateData={setUpdateData} />
           ) : (
             <DialogDemo selectedCountry={country} setUpdateData={setUpdateData} />
           )}
+          {/* <ToastDemo/> */}
         </div>
 
         <div className="mt-6 ml-7">

@@ -22,8 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast"
 
-export const AdminDialogDemo= React.memo(({countries,alluserData})=> {
+export const AdminDialogDemo= React.memo(({countries,alluserData,setUpdateData})=> {
   const user=useCurrentUser();
   const [open, setOpen] = useState(false); // Control the modal open state
 
@@ -36,11 +37,31 @@ export const AdminDialogDemo= React.memo(({countries,alluserData})=> {
 // console.log("this is all user data",alluserData);
 console.log("this is the selected user role ",selectedUserRole);
 
+const { toast } = useToast()
 
+
+const toastAction = ({varient,title,description}) => {
+  toast({
+    variant: varient,
+    title: title,
+    description: description,
+  })
+}
 
 
   const handleSubmit = async () => {
+    
+    if(description === "" || country === "" || role === ""){
+      
+      return  toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: "Please fill all the fields",
+      });
+    }
     setOpen(false)
+    setUpdateData((prev)=>!prev)
+
     try {
       const response = await fetch("/api/admin", {
         method: "POST",
@@ -58,28 +79,34 @@ console.log("this is the selected user role ",selectedUserRole);
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Error creating data:", error);
-        alert(`Failed to create data: ${error.error}`);
+        // console.error("Error creating data:", error);
+        toastAction({
+          varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+          title: "Error",
+          description: error,
+        });
         return;
       }
 
       const result = await response.json();
       console.log("Data created successfully:", result);
-      alert("Data created successfully!");
+      toastAction({
+        varient: "success", // or "error", "info", etc., depending on your toast implementation
+        title: "Task Created",
+        description: "Your Task has been successfully created",
+      });
+      setDescription("")
+
     } catch (error) {
       console.error("An error occurred:", error);
-      alert("An unexpected error occurred.");
+      toastAction({
+        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+        title: "Error",
+        description: error,
+      });
     }
   };
 
-  // useEffect(() => {
-
-  //   // to fetch the user data from the api
-  //   const getData = async () => {
-   
-  //   }
-  //   getData();
-  // } ,[user]);
 
 
   const handleSetData=(data)=>{
@@ -88,9 +115,6 @@ console.log("this is the selected user role ",selectedUserRole);
   }
  
     // Handle textarea change
-
-
-
     const handleChange = useCallback(
       (event) => {
         setDescription(event.target.value); // Only update the state for description
