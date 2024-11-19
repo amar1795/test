@@ -8,7 +8,7 @@ import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
 
 
-const DEFAULT_LOGIN_REDIRECT = "/home";
+const DEFAULT_LOGIN_REDIRECT = `${process.env.MAIN_DOMAIN}/home`;
 
 export const getUserByUsername = async (username: string) => {
     try {
