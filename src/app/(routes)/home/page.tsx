@@ -107,7 +107,7 @@ const Page = () => {
   useEffect(() => {
     fetchTaskData();
     
-  }, [fetchTaskData,updateData]);
+  }, [updateData]);
 
   const handleCountryChange = async (value: string) => {
     setCountry(value);

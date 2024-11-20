@@ -48,6 +48,11 @@ const toastAction = ({varient,title,description}) => {
   })
 }
 
+const updateData=()=>{
+  // alert("data updated")
+  setUpdateData((prev)=>!prev)
+
+}
 
   const handleSubmit = async () => {
     
@@ -60,8 +65,7 @@ const toastAction = ({varient,title,description}) => {
       });
     }
     setOpen(false)
-    setUpdateData((prev)=>!prev)
-
+    updateData()
     try {
       const response = await fetch(`${process.env.MAIN_DOMAIN}/api/admin`, {
         method: "POST",
