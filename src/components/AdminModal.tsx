@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui/textarea"
-import React, { use, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import {
   Select,
@@ -21,51 +21,76 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-export const AdminDialogDemo= React.memo(({countries,alluserData,setUpdateData})=> {
-  const user=useCurrentUser();
-  const [open, setOpen] = useState(false); // Control the modal open state
+export const AdminDialogDemo = React.memo(({ countries, alluserData, setUpdateData }) => {
+  const user = useCurrentUser();
+  const { toast } = useToast();
+  
+  // Form state
+  const [formState, setFormState] = useState({
+    open: false,
+    description: "",
+    country: "",
+    selectedUserId: null,
+    selectedUserRole: null,
+    isSubmitting: false
+  });
 
-  const [name, setName] = useState(user?.name);
-  const [country,setCountry ] = useState(user?.country);
-  const [description,setDescription] = useState("");
-  const [role,setRole] = useState(user?.role);
-  const [selectedUserId,setselectedUserId] = useState(null);
-  const [selectedUserRole,setselectedUserRole] = useState(null);
-// console.log("this is all user data",alluserData);
-// console.log("this is the selected user role ",selectedUserRole);
+  // Toast helper
+  const showToast = useCallback(({ variant, title, description }) => {
+    toast({
+      variant,
+      title,
+      description,
+    });
+  }, [toast]);
 
-const { toast } = useToast()
-
-
-const toastAction = ({varient,title,description}) => {
-  toast({
-    variant: varient,
-    title: title,
-    description: description,
-  })
-}
-
-const updateData=()=>{
-  // alert("data updated")
-  setUpdateData((prev)=>!prev)
-
-}
-
-  const handleSubmit = async () => {
-    
-    if(description === "" || country === "" || role === ""){
-      
-      return  toastAction({
-        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
-        title: "Error",
-        description: "Please fill all the fields",
-      });
+  // Handle user selection
+  const handleUserSelect = useCallback((userName) => {
+    const selectedUser = alluserData.find((user) => user.name === userName);
+    if (selectedUser) {
+      setFormState(prev => ({
+        ...prev,
+        selectedUserId: selectedUser.id,
+        selectedUserRole: selectedUser.role
+      }));
     }
-    setOpen(false)
-    updateData()
+  }, [alluserData]);
+
+  // Handle country selection
+  const handleCountrySelect = useCallback((country) => {
+    setFormState(prev => ({
+      ...prev,
+      country
+    }));
+  }, []);
+
+  // Handle description change
+  const handleDescriptionChange = useCallback((event) => {
+    setFormState(prev => ({
+      ...prev,
+      description: event.target.value
+    }));
+  }, []);
+
+  // Handle form submission
+  const handleSubmit = useCallback(async () => {
+    const { description, country, selectedUserId, selectedUserRole } = formState;
+    
+    // Validation
+    if (!description || !country || !selectedUserId) {
+      showToast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill all the fields"
+      });
+      return;
+    }
+
+    setFormState(prev => ({ ...prev, isSubmitting: true }));
+
     try {
       const response = await fetch(`${process.env.MAIN_DOMAIN}/api/admin`, {
         method: "POST",
@@ -73,157 +98,128 @@ const updateData=()=>{
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          description: description,
-          country: country,
+          description,
+          country,
           role: selectedUserRole,
-          id:selectedUserId,
-          assignedBy:user?.id,
+          id: selectedUserId,
+          assignedBy: user?.id,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        // console.error("Error creating data:", error);
-        toastAction({
-          varient: "destructive", // or "error", "info", etc., depending on your toast implementation
-          title: "Error",
-          description: error,
-        });
-        return;
+        throw new Error(error);
       }
 
-      const result = await response.json();
-      // console.log("Data created successfully:", result);
-      toastAction({
-        varient: "success", // or "error", "info", etc., depending on your toast implementation
+      await response.json();
+      
+      // Success handling
+      showToast({
+        variant: "success",
         title: "Task Created",
-        description: "Your Task has been successfully created",
+        description: "Your Task has been successfully created"
       });
-      setDescription("")
+      
+      // Reset form and close dialog
+      setFormState(prev => ({
+        ...prev,
+        open: false,
+        description: "",
+        country: "",
+        selectedUserId: null,
+        selectedUserRole: null
+      }));
+      
+      // Update parent component
+      setUpdateData(prev => !prev);
 
     } catch (error) {
-      console.error("An error occurred:", error);
-      toastAction({
-        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
+      showToast({
+        variant: "destructive",
         title: "Error",
-        description: error,
+        description: error.message
       });
+    } finally {
+      setFormState(prev => ({ ...prev, isSubmitting: false }));
     }
-  };
-
-
-
-  const handleSetData=(data)=>{
-    setselectedUserId(data.id);
-    setselectedUserRole(data.role);
-  }
- 
-    // Handle textarea change
-    const handleChange = useCallback(
-      (event) => {
-        setDescription(event.target.value); // Only update the state for description
-      },
-      [setDescription]
-    );
+  }, [formState, user?.id, showToast, setUpdateData]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog 
+      open={formState.open} 
+      onOpenChange={(open) => setFormState(prev => ({ ...prev, open }))}
+    >
       <DialogTrigger asChild>
-        <Button  className=" bg-black text-white hover:bg-white hover:text-black " >Create Task +</Button>
+        <Button className="bg-black text-white hover:bg-white hover:text-black">
+          Create Task +
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Task</DialogTitle>
-          <DialogDescription>
-            Please Add your Task here.
-          </DialogDescription>
+          <DialogDescription>Please Add your Task here.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className=" flex gap-4 items-center">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-
-
-                <div className="w-[10rem] pt-1.5 ">
-                <Select 
-                 onValueChange={(value) => {
-                  const selectedUser = alluserData.find((user) => user.name === value);
-                  handleSetData(selectedUser); // Call your function with the selected user data
-                  setCountry(value); // Update the state for country
-                }}
-                //  value={watch("country")} // Add this to sync with form state
->
-                  <SelectTrigger id="framework">
-                    <SelectValue placeholder="select a user" />
-                  </SelectTrigger>
-
-                  <SelectContent position="popper"  >
-                    {alluserData.length > 0 && (
-                      <>
-                          {alluserData.map((userName, index) => (
-                            <SelectItem
-                              value={userName?.name}
-                              key={index}
-                              // onClick={()=>handleSetData(userName)}
-  
-                            >
-                              {userName?.name}
-                            </SelectItem>
-                          ))}
-                      </>
-                    )}
-                  </SelectContent>
-              
-                </Select>
-                </div>
-          </div>
+          {/* User Selection */}
           <div className="flex gap-4 items-center">
-            <Label htmlFor="username" className="text-right">
-              Country
-            </Label>
-
-              <div className="w-[10rem] pt-1.5 ">
-                <Select 
-                 onValueChange={(value) => setCountry(value)}
->
-                  <SelectTrigger id="framework">
-                    <SelectValue placeholder="select a country" />
-                  </SelectTrigger>
-
-                  <SelectContent position="popper"  >
-                    {countries.length > 0 && (
-                      <>
-                        {countries.map((country, index) => (
-                          <SelectItem
-                            value={country}
-                            key={index}
- 
-                          >
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </>
-                    )}
-                  </SelectContent>
-              
-                </Select>
-                </div>
+            <Label htmlFor="name" className="text-right">Name</Label>
+            <div className="w-[10rem] pt-1.5">
+              <Select onValueChange={handleUserSelect}>
+                <SelectTrigger id="framework">
+                  <SelectValue placeholder="select a user" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {alluserData.map((userName, index) => (
+                    <SelectItem value={userName?.name} key={index}>
+                      {userName?.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="">
-            <Label htmlFor="username" className="text-right" >
-              Description
-            </Label>
-            <Textarea placeholder="Type your Task here."  value={description}  onChange={handleChange} />
 
+          {/* Country Selection */}
+          <div className="flex gap-4 items-center">
+            <Label htmlFor="country" className="text-right">Country</Label>
+            <div className="w-[10rem] pt-1.5">
+              <Select onValueChange={handleCountrySelect}>
+                <SelectTrigger id="framework">
+                  <SelectValue placeholder="select a country" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {countries.map((country, index) => (
+                    <SelectItem value={country} key={index}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <Label htmlFor="description" className="text-right">Description</Label>
+            <Textarea 
+              placeholder="Type your Task here." 
+              value={formState.description} 
+              onChange={handleDescriptionChange}
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>Create</Button>
+          <Button 
+            type="submit" 
+            onClick={handleSubmit}
+            disabled={formState.isSubmitting}
+          >
+            {formState.isSubmitting ? "Creating..." : "Create"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-})
+  );
+});
 
 AdminDialogDemo.displayName = "AdminDialogDemo";
