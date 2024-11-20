@@ -30,35 +30,78 @@ const Page = () => {
   const [country, setCountry] = useState<string | null>(user?.country);
   const [error, setError] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState([]);
-  const [updateData, setUpdateData] = useState(false);
-  // Fetch countries once on component mount
+  const [updateTrigger, setUpdateTrigger] = useState(0); // Replace boolean with counter
+
+  // Fetch countries data
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch("https://restcountries.com/v3.1/all");
+        const data = await response.json();
         const countryNames = data.map((country: any) => country.name.common);
         setCountries(countryNames);
-      })
-      .catch((error) => console.error("Error fetching countries:", error));
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+    fetchCountries();
   }, []);
 
-  // Fetch user data
+  // Fetch user data with error handling and loading state
   const fetchUserData = useCallback(async () => {
-    if (user) {
-      const countryData = await getUserCountry(user?.id);
+    if (!user?.id) return;
+
+    try {
+      const [countryData, allUserData] = await Promise.all([
+        getUserCountry(user.id),
+        getNonAdminUsers()
+      ]);
+      
       setUserCountry(countryData);
-      const allUserData = await getNonAdminUsers();
       setAllUsers(allUserData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError("Failed to fetch user data");
     }
-  }, [user]);
+  }, [user?.id]);
 
+  // Fetch task data with proper error handling
+  const fetchTaskData = useCallback(async () => {
+    if (!user?.id) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch task data');
+      }
+      const taskData = await response.json();
+      setData(taskData);
+    } catch (error) {
+      console.error("Error fetching task data:", error);
+      setError("Failed to fetch task data");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  // Combined effect for fetching both user and task data
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    const fetchAllData = async () => {
+      await Promise.all([
+        fetchUserData(),
+        fetchTaskData()
+      ]);
+    };
+    
+    fetchAllData();
+  }, [fetchUserData, fetchTaskData, updateTrigger]);
 
-  // Update user country
+  // Update user country with proper error handling
   const updateUserCountry = useCallback(async (selectedCountry: string) => {
-    if (!selectedCountry) return;
+    if (!selectedCountry || !user?.id) return;
 
     setIsLoading(true);
     setError(null);
@@ -78,45 +121,26 @@ const Page = () => {
         throw new Error(data.message || "Failed to update country");
       }
 
-      // Fetch updated data after successful update
-      await fetchUserData();
-      await fetchTaskData();
+      // Trigger a refresh of all data
+      setUpdateTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Error updating country:", error);
       setError(error instanceof Error ? error.message : "Failed to update country");
     } finally {
       setIsLoading(false);
     }
-  }, [fetchUserData]);
+  }, [user?.id]);
 
-  // Fetch task data
-  const fetchTaskData = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data`);
-      const taskData = await response.json();
-      setData(taskData);
-      setIsLoading(false);
-
-    } catch (error) {
-      console.error("Error fetching task data:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTaskData();
-    
-  }, [updateData]);
-
-  const handleCountryChange = async (value: string) => {
+  const handleCountryChange = (value: string) => {
     setCountry(value);
-    await updateUserCountry(value);
+    updateUserCountry(value);
   };
 
+  const handleDataUpdate = useCallback(() => {
+    setUpdateTrigger(prev => prev + 1);
+  }, []);
+
   const initiateLogout = () => signOut({ redirect: true, callbackUrl: "/" });
-
-
 
   return (
     <div>
@@ -154,9 +178,16 @@ const Page = () => {
       <div>
         <div className="mt-7 ml-8">
           {user?.role === "ADMIN" ? (
-            <AdminDialogDemo countries={countries} alluserData={allUsers} setUpdateData={setUpdateData} />
+            <AdminDialogDemo 
+              countries={countries} 
+              alluserData={allUsers} 
+              setUpdateData={handleDataUpdate}
+            />
           ) : (
-            <DialogDemo selectedCountry={country} setUpdateData={setUpdateData} />
+            <DialogDemo 
+              selectedCountry={country} 
+              setUpdateData={handleDataUpdate}
+            />
           )}
         </div>
 
@@ -166,12 +197,20 @@ const Page = () => {
           </h1>
           
           <div className="flex gap-7 flex-wrap">
-
-          {isLoading ? <div className=" text-[2rem] flex w-full justify-center "><Spinner/></div>:(<>
-            {data.length !== 0 && data?.map((task) => (
-              <CardWithForm key={task?.id} task={task} currentUser={user} setUpdateData={setUpdateData} />
-            ))}</>)}
-           
+            {isLoading ? (
+              <div className="text-[2rem] flex w-full justify-center">
+                <Spinner/>
+              </div>
+            ) : (
+              data.length !== 0 && data?.map((task) => (
+                <CardWithForm 
+                  key={task?.id} 
+                  task={task} 
+                  currentUser={user} 
+                  setUpdateData={handleDataUpdate}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
