@@ -13,50 +13,63 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui/textarea"
-import { use, useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast"
-import { title } from "process"
 
-export function DialogDemo({selectedCountry,setUpdateData}) {
-  const user=useCurrentUser();
-  const [open, setOpen] = useState(false); // Control the modal open state
+export function DialogDemo({selectedCountry, setUpdateData}) {
+  const user = useCurrentUser();
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [name, setName] = useState(user?.name);
-  const [country,setCountry ] = useState(user?.country);
-  const [description,setDescription] = useState("");
-  const [role,setRole] = useState(user?.role);
-  // console.log("this is description",description);
-  const { toast } = useToast()
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    country: selectedCountry || user?.country || '',
+    description: '',
+    role: user?.role || ''
+  });
 
-  const toastAction = ({varient,title,description}) => {
+  const { toast } = useToast();
+
+  // Update country when selectedCountry changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev, 
+      country: selectedCountry || prev.country
+    }));
+  }, [selectedCountry]);
+
+  // Consolidated change handler
+  const handleChange = useCallback((key: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  }, []);
+
+  // Toast notification helper
+  const showToast = useCallback((variant: 'default' | 'destructive' | 'success', title: string, description: string) => {
     toast({
-      variant: varient,
-      title: title,
-      description: description,
-    })
-  }
+      variant,
+      title,
+      description
+    });
+  }, [toast]);
 
+  // Submit handler with improved error handling
   const handleSubmit = async () => {
-   
-    if(description === "" || country === "" || role === ""){
-      
-      return  toastAction({
-        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
-        title: "Error",
-        description: "Please fill all the fields",
-      });
+    // Validation
+    if (!formData.description || !formData.country || !formData.role) {
+      showToast('destructive', 'Error', 'Please fill all the fields');
+      return;
     }
-    setOpen(false)
-    
-    setUpdateData((prev)=>!prev)
+
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setOpen(false);
+
     try {
       const response = await fetch(`${process.env.MAIN_DOMAIN}/api/data`, {
         method: "POST",
@@ -64,53 +77,40 @@ export function DialogDemo({selectedCountry,setUpdateData}) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          description: description,
-          country: country,
-          role: role,
-          id:user?.id
+          description: formData.description,
+          country: formData.country,
+          role: formData.role,
+          id: user?.id
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Error creating data:", error);
-        // alert(`Failed to create data: ${error.error}`);
-        return;
+        throw new Error(error.message || 'Failed to create task');
       }
 
-      const result = await response.json();
-      // console.log("Data created successfully:", result);
-      toastAction({
-        varient: "success", // or "error", "info", etc., depending on your toast implementation
-        title: "Task Created",
-        description: "Your Task has been successfully created",
-      });
-      setDescription("")
+      // Trigger data update
+      setUpdateData(prev => prev + 1);  // Use increment instead of toggle
+
+      // Success toast
+      showToast('success', 'Task Created', 'Your task has been successfully created');
+
+      // Reset description
+      setFormData(prev => ({...prev, description: ''}));
     } catch (error) {
-      console.error("An error occurred:", error);
-      toastAction({
-        varient: "destructive", // or "error", "info", etc., depending on your toast implementation
-        title: "Error",
-        description: error,
-      });
-
-      // alert("An unexpected error occurred.");
+      console.error("Task creation error:", error);
+      showToast('destructive', 'Error', error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  useEffect(() => {
-setCountry(selectedCountry)
-// toastAction()
-  } ,[selectedCountry]);
- 
-  const handleChange = (event) => {
-    setDescription(event.target.value); // Update the state with the textarea value
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button  className=" bg-black text-white hover:bg-white hover:text-black " >Create Task +</Button>
+        <Button className="bg-black text-white hover:bg-white hover:text-black">
+          Create Task +
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -120,39 +120,48 @@ setCountry(selectedCountry)
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className=" flex gap-4 items-center">
+          <div className="flex gap-4 items-center">
             <Label htmlFor="name" className="text-right">
               Name
             </Label>
             <Input
               id="name"
-              defaultValue={name}
+              value={formData.name}
               className="col-span-3"
               disabled
             />
           </div>
           <div className="flex gap-4 items-center">
-            <Label htmlFor="username" className="text-right">
+            <Label htmlFor="country" className="text-right">
               Country
             </Label>
             <Input
-              id="username"
-              defaultValue={selectedCountry}
+              id="country"
+              value={formData.country}
               className="col-span-3"
               disabled
             />
-            
           </div>
           <div className="">
-            <Label htmlFor="username" className="text-right" >
+            <Label htmlFor="description" className="text-right">
               Description
             </Label>
-            <Textarea placeholder="Type your Task here."  value={description}  onChange={handleChange} />
-
+            <Textarea 
+              id="description"
+              placeholder="Type your Task here." 
+              value={formData.description}  
+              onChange={(e) => handleChange('description', e.target.value)} 
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>Create</Button>
+          <Button 
+            type="submit" 
+            onClick={handleSubmit} 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
